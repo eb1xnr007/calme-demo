@@ -1,0 +1,16 @@
+# Build and local tool state
+.kotlin/
+.gradle/
+build/
+local.properties
+captures/
+
+# IDE and OS files
+.idea/
+*.iml
+.DS_Store
+
+# Xcode user state (keep project.pbxproj and shared schemes)
+**/xcuserdata/
+**/*.xcuserstate
+**/xcshareddata/WorkspaceSettings.xcsettings

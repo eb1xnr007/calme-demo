@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RULESET_VERSION="0.6.3"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/calme/ktlint"
+RULESET_JAR="$CACHE_DIR/compose-rules-$RULESET_VERSION.jar"
+
+if [[ ! -f "$RULESET_JAR" ]]; then
+  mkdir -p "$CACHE_DIR"
+  BUILD_DIR="$(mktemp -d)"
+  trap 'rm -rf "$BUILD_DIR"' EXIT
+  curl -fsSL \
+    "https://repo1.maven.org/maven2/io/nlopez/compose/rules/ktlint/$RULESET_VERSION/ktlint-$RULESET_VERSION.jar" \
+    -o "$BUILD_DIR/ktlint.jar"
+  curl -fsSL \
+    "https://repo1.maven.org/maven2/io/nlopez/compose/rules/common-ktlint/$RULESET_VERSION/common-ktlint-$RULESET_VERSION.jar" \
+    -o "$BUILD_DIR/common-ktlint.jar"
+  (
+    cd "$BUILD_DIR"
+    mkdir classes
+    cd classes
+    jar xf ../ktlint.jar
+    jar xf ../common-ktlint.jar
+    jar cf "$RULESET_JAR" .
+  )
+fi
+
+exec ktlint --ruleset="$RULESET_JAR" "$@"
